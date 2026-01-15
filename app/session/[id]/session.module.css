@@ -1,0 +1,320 @@
+.main {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.backBtn {
+  padding: 8px 16px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+}
+
+.backBtn:hover {
+  color: var(--text-primary);
+  background: var(--bg-glass);
+}
+
+.sessionInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.exerciseIcon {
+  font-size: 1.5rem;
+}
+
+.exerciseName {
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.connectionStatus {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-danger);
+  transition: background 0.3s;
+}
+
+.statusDot.connected {
+  background: var(--accent-success);
+  box-shadow: 0 0 10px var(--accent-success);
+}
+
+/* Content */
+.content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
+  padding: 24px;
+}
+
+@media (max-width: 1024px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Video Section */
+.videoSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.videoContainer {
+  position: relative;
+  aspect-ratio: 4/3;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-glass);
+}
+
+.videoHidden {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+}
+
+.processedFrame {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.videoPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary));
+}
+
+.placeholderContent {
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.cameraIcon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.overlayStats {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.fpsCounter {
+  padding: 4px 12px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-success);
+}
+
+.calibrating {
+  padding: 4px 12px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--accent-warning);
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+/* Metrics Panel */
+.metricsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.statCard {
+  background: var(--bg-glass);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.statCard:hover {
+  border-color: var(--accent-primary);
+}
+
+.primaryStat {
+  padding: 40px 24px;
+}
+
+.primaryStat .statValue {
+  font-size: 80px;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.statValue {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+
+.statValueSmall {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent-primary);
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 8px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Feedback Banner */
+.feedbackBanner {
+  padding: 16px 24px;
+  border-radius: var(--radius-md);
+  text-align: center;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.feedbackBanner.neutral {
+  background: var(--bg-glass);
+  border: 1px solid var(--border-glass);
+  color: var(--text-secondary);
+}
+
+.feedbackBanner.success {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: var(--accent-success);
+}
+
+.feedbackBanner.warning {
+  background: rgba(250, 204, 21, 0.15);
+  border: 1px solid rgba(250, 204, 21, 0.3);
+  color: var(--accent-warning);
+}
+
+.feedbackText {
+  display: block;
+}
+
+/* Error Banner */
+.errorBanner {
+  padding: 12px 16px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  color: var(--accent-danger);
+  font-size: 0.875rem;
+}
+
+/* Final Metrics */
+.finalMetrics {
+  background: var(--bg-glass);
+  border: 1px solid var(--accent-success);
+  border-radius: var(--radius-md);
+  padding: 24px;
+}
+
+.finalTitle {
+  font-size: 1.25rem;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.metricsJson {
+  max-height: 300px;
+  overflow-y: auto;
+  background: var(--bg-primary);
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+}
+
+.metricsJson pre {
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--accent-primary);
+}
+
+/* Spinner */
+.spinner {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-glass);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
