@@ -5,7 +5,7 @@ import { getWebSocketUrl } from '@/lib/api';
 
 /**
  * Custom hook for WebSocket exercise streaming
- * HEAVILY OPTIMIZED for low-latency performance
+ * OPTIMIZED: Fixed 320x240 resolution, 12 FPS, with skeleton display
  */
 export function useExerciseSocket(sessionId, options = {}) {
   const { autoConnect = false, onMessage, onError } = options;
@@ -20,7 +20,7 @@ export function useExerciseSocket(sessionId, options = {}) {
   const canvasRef = useRef(null);
   const videoRef = useRef(null);
   const frameLoopRef = useRef(null);
-  const pendingFrameRef = useRef(false); // Flow control
+  const pendingFrameRef = useRef(false);
   
   // Metrics state
   const [metrics, setMetrics] = useState({
@@ -92,7 +92,7 @@ export function useExerciseSocket(sessionId, options = {}) {
             fpsCounterRef.current.lastTime = now;
           }
           
-          // Update metrics (batched for performance)
+          // Update metrics
           setMetrics(m => ({
             ...m,
             counter: data.counter ?? m.counter,
@@ -161,7 +161,7 @@ export function useExerciseSocket(sessionId, options = {}) {
     setIsStreaming(false);
   }, []);
 
-  // Start camera and streaming - HEAVILY OPTIMIZED
+  // Start camera and streaming - FIXED 320x240 @ 12 FPS
   const startStreaming = useCallback(async (videoElement) => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
       setError('WebSocket not connected');
@@ -169,13 +169,13 @@ export function useExerciseSocket(sessionId, options = {}) {
     }
     
     try {
-      // VERY LOW resolution for minimal latency
+      // Fixed 320x240 resolution
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { 
-          width: { ideal: 320 }, 
-          height: { ideal: 240 }, 
+          width: { exact: 320 }, 
+          height: { exact: 240 }, 
           facingMode: 'user',
-          frameRate: { ideal: 15, max: 15 }
+          frameRate: { max: 15 }
         }
       });
       
@@ -186,7 +186,7 @@ export function useExerciseSocket(sessionId, options = {}) {
         videoRef.current = videoElement;
       }
       
-      // Tiny canvas for minimal data transfer
+      // Canvas matches camera resolution
       const canvas = document.createElement('canvas');
       canvas.width = 320;
       canvas.height = 240;
@@ -195,9 +195,9 @@ export function useExerciseSocket(sessionId, options = {}) {
       
       setIsStreaming(true);
       
-      // Fixed interval with flow control - only send when previous frame processed
+      // Fixed 12 FPS with flow control
       let lastFrameTime = 0;
-      const frameInterval = 100; // 10 FPS max to reduce load
+      const frameInterval = 83; // ~12 FPS
       
       const sendFrame = (timestamp) => {
         if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
@@ -205,7 +205,6 @@ export function useExerciseSocket(sessionId, options = {}) {
           return;
         }
         
-        // Flow control: don't send if previous frame still pending
         const timePassed = timestamp - lastFrameTime >= frameInterval;
         const canSend = !pendingFrameRef.current;
         
@@ -215,28 +214,80 @@ export function useExerciseSocket(sessionId, options = {}) {
           if (videoRef.current && videoRef.current.readyState >= 2) {
             ctx.drawImage(videoRef.current, 0, 0, 320, 240);
             
-            // Very low quality JPEG (30%) for fastest transfer
+            // 35% quality for smaller file size
             canvas.toBlob((blob) => {
               if (blob && wsRef.current?.readyState === WebSocket.OPEN && !pendingFrameRef.current) {
-                pendingFrameRef.current = true; // Mark as pending
+                pendingFrameRef.current = true;
                 wsRef.current.send(blob);
               }
-            }, 'image/jpeg', 0.3);
+            }, 'image/jpeg', 0.35);
           }
         }
         
         frameLoopRef.current = requestAnimationFrame(sendFrame);
       };
       
-      // Wait for video ready
       videoElement.onloadedmetadata = () => {
         videoElement.play();
         requestAnimationFrame(sendFrame);
       };
       
     } catch (e) {
-      setError(`Camera error: ${e.message}`);
-      console.error('Failed to start camera:', e);
+      // Fallback if exact resolution not supported
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { 
+            width: { ideal: 320 }, 
+            height: { ideal: 240 }, 
+            facingMode: 'user'
+          }
+        });
+        streamRef.current = stream;
+        if (videoElement) {
+          videoElement.srcObject = stream;
+          videoRef.current = videoElement;
+        }
+        // Continue with same logic...
+        const canvas = document.createElement('canvas');
+        canvas.width = 320;
+        canvas.height = 240;
+        canvasRef.current = canvas;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        setIsStreaming(true);
+        
+        let lastFrameTime = 0;
+        const frameInterval = 83;
+        
+        const sendFrame = (timestamp) => {
+          if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+            setIsStreaming(false);
+            return;
+          }
+          const timePassed = timestamp - lastFrameTime >= frameInterval;
+          const canSend = !pendingFrameRef.current;
+          if (timePassed && canSend) {
+            lastFrameTime = timestamp;
+            if (videoRef.current && videoRef.current.readyState >= 2) {
+              ctx.drawImage(videoRef.current, 0, 0, 320, 240);
+              canvas.toBlob((blob) => {
+                if (blob && wsRef.current?.readyState === WebSocket.OPEN && !pendingFrameRef.current) {
+                  pendingFrameRef.current = true;
+                  wsRef.current.send(blob);
+                }
+              }, 'image/jpeg', 0.35);
+            }
+          }
+          frameLoopRef.current = requestAnimationFrame(sendFrame);
+        };
+        
+        videoElement.onloadedmetadata = () => {
+          videoElement.play();
+          requestAnimationFrame(sendFrame);
+        };
+      } catch (e2) {
+        setError(`Camera error: ${e2.message}`);
+        console.error('Failed to start camera:', e2);
+      }
     }
   }, []);
 
