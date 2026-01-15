@@ -5,7 +5,7 @@ import { getWebSocketUrl } from '@/lib/api';
 
 /**
  * Custom hook for WebSocket exercise streaming
- * Optimized for performance with frame throttling
+ * HEAVILY OPTIMIZED for low-latency performance
  */
 export function useExerciseSocket(sessionId, options = {}) {
   const { autoConnect = false, onMessage, onError } = options;
@@ -20,6 +20,7 @@ export function useExerciseSocket(sessionId, options = {}) {
   const canvasRef = useRef(null);
   const videoRef = useRef(null);
   const frameLoopRef = useRef(null);
+  const pendingFrameRef = useRef(false); // Flow control
   
   // Metrics state
   const [metrics, setMetrics] = useState({
@@ -64,6 +65,10 @@ export function useExerciseSocket(sessionId, options = {}) {
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
+          
+          // Mark frame as processed - allow sending next frame
+          pendingFrameRef.current = false;
+          
           setLastMessage(data);
           
           if (data.type === 'connected') {
@@ -87,7 +92,7 @@ export function useExerciseSocket(sessionId, options = {}) {
             fpsCounterRef.current.lastTime = now;
           }
           
-          // Update metrics
+          // Update metrics (batched for performance)
           setMetrics(m => ({
             ...m,
             counter: data.counter ?? m.counter,
@@ -106,6 +111,7 @@ export function useExerciseSocket(sessionId, options = {}) {
           onMessage?.(data);
         } catch (e) {
           console.error('Error parsing message:', e);
+          pendingFrameRef.current = false;
         }
       };
       
@@ -155,7 +161,7 @@ export function useExerciseSocket(sessionId, options = {}) {
     setIsStreaming(false);
   }, []);
 
-  // Start camera and streaming - OPTIMIZED for performance
+  // Start camera and streaming - HEAVILY OPTIMIZED
   const startStreaming = useCallback(async (videoElement) => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
       setError('WebSocket not connected');
@@ -163,13 +169,13 @@ export function useExerciseSocket(sessionId, options = {}) {
     }
     
     try {
-      // Lower resolution = faster processing
+      // VERY LOW resolution for minimal latency
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { 
-          width: { ideal: 480 }, 
-          height: { ideal: 360 }, 
+          width: { ideal: 320 }, 
+          height: { ideal: 240 }, 
           facingMode: 'user',
-          frameRate: { ideal: 30 }
+          frameRate: { ideal: 15, max: 15 }
         }
       });
       
@@ -180,18 +186,18 @@ export function useExerciseSocket(sessionId, options = {}) {
         videoRef.current = videoElement;
       }
       
-      // Canvas for frame capture
+      // Tiny canvas for minimal data transfer
       const canvas = document.createElement('canvas');
-      canvas.width = 480;
-      canvas.height = 360;
+      canvas.width = 320;
+      canvas.height = 240;
       canvasRef.current = canvas;
       const ctx = canvas.getContext('2d', { willReadFrequently: true });
       
       setIsStreaming(true);
       
-      // Frame throttling for ~15 FPS (reduces CPU/network load significantly)
+      // Fixed interval with flow control - only send when previous frame processed
       let lastFrameTime = 0;
-      const frameInterval = 66; // ~15 FPS
+      const frameInterval = 100; // 10 FPS max to reduce load
       
       const sendFrame = (timestamp) => {
         if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
@@ -199,18 +205,23 @@ export function useExerciseSocket(sessionId, options = {}) {
           return;
         }
         
-        // Only send frame if enough time passed
-        if (timestamp - lastFrameTime >= frameInterval) {
+        // Flow control: don't send if previous frame still pending
+        const timePassed = timestamp - lastFrameTime >= frameInterval;
+        const canSend = !pendingFrameRef.current;
+        
+        if (timePassed && canSend) {
           lastFrameTime = timestamp;
           
           if (videoRef.current && videoRef.current.readyState >= 2) {
-            ctx.drawImage(videoRef.current, 0, 0, 480, 360);
-            // 50% quality JPEG for faster transfer
+            ctx.drawImage(videoRef.current, 0, 0, 320, 240);
+            
+            // Very low quality JPEG (30%) for fastest transfer
             canvas.toBlob((blob) => {
-              if (blob && wsRef.current?.readyState === WebSocket.OPEN) {
+              if (blob && wsRef.current?.readyState === WebSocket.OPEN && !pendingFrameRef.current) {
+                pendingFrameRef.current = true; // Mark as pending
                 wsRef.current.send(blob);
               }
-            }, 'image/jpeg', 0.5);
+            }, 'image/jpeg', 0.3);
           }
         }
         
