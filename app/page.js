@@ -1,113 +1,199 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { EXERCISES, createSession } from '@/lib/api';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { 
+  Play, 
+  TrendingUp, 
+  Clock, 
+  Flame,
+  ChevronRight,
+  Trophy,
+  Activity
+} from 'lucide-react';
+import { 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer 
+} from 'recharts';
 import styles from './page.module.css';
 
-export default function Home() {
-  const router = useRouter();
-  const [selectedExercise, setSelectedExercise] = useState(null);
-  const [height, setHeight] = useState(170);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+// Mock progress data
+const progressData = [
+  { day: 'Mon', score: 65 },
+  { day: 'Tue', score: 72 },
+  { day: 'Wed', score: 68 },
+  { day: 'Thu', score: 85 },
+  { day: 'Fri', score: 82 },
+  { day: 'Sat', score: 90 },
+  { day: 'Sun', score: 88 },
+];
 
-  const handleStart = async () => {
-    if (!selectedExercise) {
-      setError('Please select an exercise');
-      return;
-    }
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className={styles.chartTooltip}>
+        <p className={styles.tooltipLabel}>{label}</p>
+        <p className={styles.tooltipValue}>Score: {payload[0].value}</p>
+      </div>
+    );
+  }
+  return null;
+};
 
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const session = await createSession(selectedExercise.id, height);
-      router.push(`/session/${session.session_id}`);
-    } catch (e) {
-      setError(e.message);
-      setIsLoading(false);
-    }
+// Mock last test data (would come from localStorage or API)
+const getLastTestData = () => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('lastTest');
+    if (saved) return JSON.parse(saved);
+  }
+  return {
+    exercise: 'Push-ups',
+    reps: 24,
+    duration: '2:45',
+    date: 'Today',
+    improvement: '+12%'
   };
+};
+
+export default function Dashboard() {
+  const [lastTest, setLastTest] = useState(null);
+
+  useEffect(() => {
+    setLastTest(getLastTestData());
+  }, []);
 
   return (
     <main className={styles.main}>
-      {/* Hero Section */}
+      {/* Hero */}
       <section className={styles.hero}>
         <div className={styles.heroContent}>
           <h1 className={styles.title}>
-            <span className={styles.titleGlow}>FitVision</span> AI
+            <span className={styles.titleAnimated}>Pratidwandhi</span>
           </h1>
           <p className={styles.subtitle}>
-            Real-time exercise analysis powered by advanced pose detection
+            Your fitness journey starts here
           </p>
         </div>
       </section>
 
-      {/* Exercise Selection */}
+      {/* Progress Graph */}
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Select Your Exercise</h2>
-        
-        <div className={styles.exerciseGrid}>
-          {EXERCISES.map((exercise) => (
-            <button
-              key={exercise.id}
-              className={`${styles.exerciseCard} ${selectedExercise?.id === exercise.id ? styles.exerciseCardSelected : ''}`}
-              onClick={() => setSelectedExercise(exercise)}
-            >
-              <span className={styles.exerciseIcon}>{exercise.icon}</span>
-              <span className={styles.exerciseName}>{exercise.name}</span>
-              <span className={styles.exerciseDesc}>{exercise.description}</span>
-            </button>
-          ))}
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Weekly Activity</h2>
+          <span className={styles.dateLabel}>Last 7 Days</span>
         </div>
-      </section>
-
-      {/* Height Input */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Your Height</h2>
-        <div className={styles.heightInput}>
-          <input
-            type="range"
-            min="100"
-            max="220"
-            value={height}
-            onChange={(e) => setHeight(Number(e.target.value))}
-            className={styles.slider}
-          />
-          <div className={styles.heightDisplay}>
-            <span className={styles.heightValue}>{height}</span>
-            <span className={styles.heightUnit}>cm</span>
+        <div className={styles.chartCard}>
+          <div className={styles.chartContainer}>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={progressData}>
+                <defs>
+                  <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#ff4d00" stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor="#ff4d00" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333" />
+                <XAxis 
+                  dataKey="day" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: '#666', fontSize: 10 }} 
+                  dy={10}
+                />
+                <YAxis hide domain={[0, 100]} />
+                <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#ff4d00', strokeWidth: 1 }} />
+                <Area 
+                  type="monotone" 
+                  dataKey="score" 
+                  stroke="#ff4d00" 
+                  fillOpacity={1} 
+                  fill="url(#colorScore)" 
+                  strokeWidth={2}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </section>
 
-      {/* Start Button */}
-      <section className={styles.startSection}>
-        {error && <p className={styles.error}>{error}</p>}
+      {/* Last Test Metrics */}
+      <section className={styles.section}>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Last Performance</h2>
+          {lastTest && <span className={styles.dateLabel}>{lastTest.date}</span>}
+        </div>
         
-        <button
-          className="btn-primary"
-          onClick={handleStart}
-          disabled={isLoading || !selectedExercise}
-        >
-          {isLoading ? (
-            <>
-              <span className={styles.spinner}></span>
-              Starting...
-            </>
-          ) : (
-            <>
-              🚀 Start Workout
-            </>
-          )}
-        </button>
-
-        {selectedExercise && (
-          <p className={styles.selectedInfo}>
-            Ready to track: <strong>{selectedExercise.name}</strong>
-          </p>
+        {lastTest ? (
+          <div className={styles.metricsCard}>
+            <div className={styles.exerciseBadge}>
+              <Trophy size={16} />
+              <span>{lastTest.exercise}</span>
+            </div>
+            
+            <div className={styles.metricsGrid}>
+              <div className={styles.metric}>
+                <Flame size={20} className={styles.metricIcon} />
+                <span className={styles.metricValue}>{lastTest.reps}</span>
+                <span className={styles.metricLabel}>Reps</span>
+              </div>
+              <div className={styles.metric}>
+                <Clock size={20} className={styles.metricIcon} />
+                <span className={styles.metricValue}>{lastTest.duration}</span>
+                <span className={styles.metricLabel}>Duration</span>
+              </div>
+              <div className={styles.metric}>
+                <TrendingUp size={20} className={styles.metricIcon} />
+                <span className={styles.metricValueGreen}>{lastTest.improvement}</span>
+                <span className={styles.metricLabel}>Progress</span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className={styles.emptyCard}>
+            <p>No tests taken yet</p>
+          </div>
         )}
+      </section>
+
+      {/* Quick Actions */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Quick Actions</h2>
+        
+        <Link href="/tests" className={styles.actionCard}>
+          <div className={styles.actionContent}>
+            <Play size={24} className={styles.actionIcon} />
+            <div>
+              <span className={styles.actionTitle}>Take New Test</span>
+              <span className={styles.actionDesc}>Choose from 8 exercises</span>
+            </div>
+          </div>
+          <ChevronRight size={20} className={styles.actionArrow} />
+        </Link>
+      </section>
+
+      {/* Stats Overview */}
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Your Stats</h2>
+        
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard}>
+            <span className={styles.statValue}>12</span>
+            <span className={styles.statLabel}>Tests Taken</span>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statValue}>5</span>
+            <span className={styles.statLabel}>Badges</span>
+          </div>
+          <div className={styles.statCard}>
+            <span className={styles.statValue}>3</span>
+            <span className={styles.statLabel}>Day Streak</span>
+          </div>
+        </div>
       </section>
     </main>
   );

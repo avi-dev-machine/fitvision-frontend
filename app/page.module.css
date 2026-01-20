@@ -1,190 +1,292 @@
 .main {
   min-height: 100vh;
-  padding: 40px 24px;
-  max-width: 1200px;
+  padding: 24px;
+  padding-top: 40px;
+  padding-bottom: 20px; /* Navbar padding handled by layout */
+  max-width: 600px;
   margin: 0 auto;
+}
+
+/* Chart */
+.chartCard {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  border: 1px solid var(--border-subtle);
+}
+
+.chartContainer {
+  height: 200px;
+  width: 100%;
+}
+
+.chartTooltip {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-subtle);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+}
+
+.tooltipLabel {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.tooltipValue {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
 }
 
 /* Hero */
 .hero {
   text-align: center;
-  padding: 60px 0 40px;
+  padding: 40px 0 32px;
 }
 
 .heroContent {
-  animation: fadeIn 0.8s ease;
+  animation: fadeIn 0.6s ease;
 }
 
 .title {
-  font-size: clamp(2.5rem, 8vw, 4.5rem);
+  font-size: clamp(2.5rem, 10vw, 3.5rem);
   font-weight: 800;
-  margin-bottom: 16px;
-  letter-spacing: -0.02em;
+  font-family: var(--font-display);
+  margin-bottom: 12px;
+  letter-spacing: -0.04em;
+  line-height: 0.95;
+  text-transform: uppercase;
 }
 
-.titleGlow {
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+.titleAnimated {
+  background: linear-gradient(
+    90deg,
+    #ff4d00 0%,
+    #ff8c00 25%,
+    #ffffff 50%,
+    #ff8c00 75%,
+    #ff4d00 100%
+  );
+  background-size: 200% auto;
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmerGradient 3s linear infinite;
+  filter: drop-shadow(0 4px 20px rgba(255, 77, 0, 0.3));
+}
+
+@keyframes shimmerGradient {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
 }
 
 .subtitle {
-  font-size: 1.125rem;
-  color: var(--text-secondary);
-  max-width: 500px;
-  margin: 0 auto;
+  font-size: 0.95rem;
+  color: var(--muted);
+  font-weight: 400;
 }
 
 /* Sections */
 .section {
-  margin-bottom: 48px;
+  margin-bottom: 32px;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
 .sectionTitle {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 24px;
-  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
-/* Exercise Grid */
-.exerciseGrid {
+.dateLabel {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* Metrics Card */
+.metricsCard {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 24px;
+}
+
+.exerciseBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(255, 77, 0, 0.1);
+  border-radius: var(--radius-full);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 20px;
+}
+
+.metricsGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
 }
 
-.exerciseCard {
+.metric {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
-  padding: 24px 16px;
-  background: var(--bg-glass);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--border-glass);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all 0.3s ease;
+  gap: 6px;
+  text-align: center;
 }
 
-.exerciseCard:hover {
-  border-color: var(--accent-primary);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 30px rgba(0, 212, 255, 0.15);
+.metricIcon {
+  color: var(--muted);
 }
 
-.exerciseCardSelected {
-  border-color: var(--accent-primary);
-  background: rgba(0, 212, 255, 0.1);
-  box-shadow: 0 0 30px rgba(0, 212, 255, 0.2);
+.metricValue {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: var(--font-display);
+  color: var(--text);
 }
 
-.exerciseIcon {
-  font-size: 2.5rem;
+.metricValueGreen {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: var(--font-display);
+  color: var(--accent-success);
 }
 
-.exerciseName {
+.metricLabel {
+  font-size: 10px;
   font-weight: 600;
-  font-size: 1rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.exerciseDesc {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+.emptyCard {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 40px;
+  text-align: center;
+  color: var(--muted);
 }
 
-/* Height Input */
-.heightInput {
+/* Action Card */
+.actionCard {
   display: flex;
   align-items: center;
-  gap: 24px;
-  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 20px;
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all 0.15s ease;
 }
 
-.slider {
-  flex: 1;
-  min-width: 200px;
-  height: 8px;
-  border-radius: 4px;
-  background: var(--bg-glass);
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
+.actionCard:hover {
+  background: var(--surface-elevated);
 }
 
-.slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-primary), #00a8cc);
-  cursor: pointer;
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
-}
-
-.slider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent-primary), #00a8cc);
-  cursor: pointer;
-  border: none;
-}
-
-.heightDisplay {
+.actionContent {
   display: flex;
-  align-items: baseline;
-  gap: 4px;
+  align-items: center;
+  gap: 16px;
 }
 
-.heightValue {
-  font-size: 3rem;
+.actionIcon {
+  color: var(--accent);
+}
+
+.actionTitle {
+  display: block;
+  font-size: 15px;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.heightUnit {
-  font-size: 1.25rem;
-  color: var(--text-muted);
+.actionDesc {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
 }
 
-/* Start Section */
-.startSection {
-  text-align: center;
-  padding: 40px 0;
+.actionArrow {
+  color: var(--muted);
 }
 
-.error {
-  color: var(--accent-danger);
-  margin-bottom: 16px;
-  font-size: 0.875rem;
+/* Stats Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 
-.selectedInfo {
-  margin-top: 16px;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
+.statCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 20px 12px;
+  background: var(--surface);
+  border-radius: var(--radius-md);
 }
 
-.spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid transparent;
-  border-top-color: currentColor;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+.statValue {
+  font-size: 32px;
+  font-weight: 800;
+  font-family: var(--font-display);
+  color: var(--text);
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.statLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .main {
+    padding: 24px 16px;
+  }
+  
+  .metricsGrid {
+    gap: 12px;
+  }
+  
+  .metricValue,
+  .metricValueGreen {
+    font-size: 24px;
+  }
+  
+  .statsGrid {
+    gap: 8px;
+  }
+  
+  .statValue {
+    font-size: 26px;
+  }
 }

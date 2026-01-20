@@ -1,0 +1,260 @@
+.main {
+  min-height: 100vh;
+  padding-bottom: 20px;
+}
+
+.header {
+  padding: 24px 24px 16px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 800;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  padding: 0 24px;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.tab {
+  flex: 1;
+  padding: 12px;
+  background: var(--surface);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.tab.active {
+  background: var(--accent);
+  color: #000;
+}
+
+/* Feed */
+.feed {
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.post {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+
+.postHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background: var(--accent);
+  color: #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.postMeta {
+  flex: 1;
+}
+
+.userName {
+  display: block;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.postTime {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.badgeTag {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: rgba(255, 77, 0, 0.1);
+  border-radius: var(--radius-full);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.postContent {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.achievementCard {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(0, 255, 135, 0.1);
+  border-radius: var(--radius-sm);
+  color: var(--accent-success);
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.achievementIcon {
+  color: var(--accent-success);
+}
+
+.trainTogetherBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.postActions {
+  display: flex;
+  gap: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.actionBtn:hover {
+  color: var(--text);
+}
+
+/* Badges */
+.badgesGrid {
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.badgeCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 24px;
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.badgeCard.locked {
+  opacity: 0.5;
+}
+
+.badgeIcon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 77, 0, 0.1);
+  border-radius: 50%;
+  color: var(--accent);
+}
+
+.badgeName {
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.lockedLabel {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* Rewards */
+.rewardsList {
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.couponCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--accent);
+}
+
+.couponBrand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.couponDetails {
+  text-align: right;
+}
+
+.discount {
+  display: block;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--accent-success);
+}
+
+.code {
+  font-size: 11px;
+  color: var(--muted);
+}

@@ -1,11 +1,11 @@
 {
-    "name": "FitVision AI",
-    "short_name": "FitVision",
+    "name": "Pratidwandhi",
+    "short_name": "Pratidwandhi",
     "description": "AI-powered real-time exercise analysis with pose detection",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#0a0f1a",
-    "theme_color": "#00d4ff",
+    "background_color": "#111111",
+    "theme_color": "#ff4d00",
     "orientation": "portrait-primary",
     "icons": [
         {
@@ -13,7 +13,8 @@
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
-        }, {
+        },
+        {
             "src": "/icon-512.png",
             "sizes": "512x512",
             "type": "image/png",
