@@ -195,14 +195,22 @@ export function useExerciseSocket(sessionId, options = {}) {
       
       setIsStreaming(true);
       
-      // Fixed 12 FPS with flow control
+      // Fixed 8 FPS for better stability on mobile networks
       let lastFrameTime = 0;
-      const frameInterval = 83; // ~12 FPS
+      const frameInterval = 125; // 8 FPS
+      let lastAckTime = Date.now();
       
       const sendFrame = (timestamp) => {
         if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
           setIsStreaming(false);
           return;
+        }
+
+        // Watchdog: If we haven't received an ACK in 2 seconds, reset pending flag
+        if (Date.now() - lastAckTime > 2000 && pendingFrameRef.current) {
+          console.warn('⚠️ Frame ACK timeout - resetting pending flag');
+          pendingFrameRef.current = false;
+          lastAckTime = Date.now(); 
         }
         
         const timePassed = timestamp - lastFrameTime >= frameInterval;
@@ -214,13 +222,13 @@ export function useExerciseSocket(sessionId, options = {}) {
           if (videoRef.current && videoRef.current.readyState >= 2) {
             ctx.drawImage(videoRef.current, 0, 0, 320, 240);
             
-            // 35% quality for smaller file size
+            // 30% quality for smaller file size
             canvas.toBlob((blob) => {
               if (blob && wsRef.current?.readyState === WebSocket.OPEN && !pendingFrameRef.current) {
                 pendingFrameRef.current = true;
                 wsRef.current.send(blob);
               }
-            }, 'image/jpeg', 0.35);
+            }, 'image/jpeg', 0.3);
           }
         }
         
@@ -256,13 +264,22 @@ export function useExerciseSocket(sessionId, options = {}) {
         setIsStreaming(true);
         
         let lastFrameTime = 0;
-        const frameInterval = 83;
+        const frameInterval = 125; // 8 FPS
+        let lastAckTime = Date.now();
         
         const sendFrame = (timestamp) => {
           if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
             setIsStreaming(false);
             return;
           }
+
+          // Watchdog: If we haven't received an ACK in 2 seconds, reset pending flag
+          if (Date.now() - lastAckTime > 2000 && pendingFrameRef.current) {
+            console.warn('⚠️ Frame ACK timeout - resetting pending flag');
+            pendingFrameRef.current = false;
+            lastAckTime = Date.now(); 
+          }
+
           const timePassed = timestamp - lastFrameTime >= frameInterval;
           const canSend = !pendingFrameRef.current;
           if (timePassed && canSend) {
@@ -274,7 +291,7 @@ export function useExerciseSocket(sessionId, options = {}) {
                   pendingFrameRef.current = true;
                   wsRef.current.send(blob);
                 }
-              }, 'image/jpeg', 0.35);
+              }, 'image/jpeg', 0.3);
             }
           }
           frameLoopRef.current = requestAnimationFrame(sendFrame);
